@@ -1,7 +1,6 @@
-using dropbox_backend.Data;
-using dropbox_backend.Models;
+using dropbox_backend.Application.DTOs;
+using dropbox_backend.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace dropbox_backend.Controllers;
 
@@ -9,31 +8,26 @@ namespace dropbox_backend.Controllers;
 [Route("api/[controller]")]
 public class UserProfileController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IUserProfileService _service;
 
-    public UserProfileController(AppDbContext context)
+    public UserProfileController(IUserProfileService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<ActionResult<UserProfile>> GetUser()
+    public async Task<ActionResult<UserProfileDto>> GetUser()
     {
-        var user = await _context.UserProfiles.FirstOrDefaultAsync();
+        var user = await _service.GetUserProfileAsync();
         if (user == null) return NotFound();
-        return user;
+        return Ok(user);
     }
-    
-    [HttpPut]
-    public async Task<IActionResult> UpdateUser(UserProfile userProfile)
-    {
-        var user = await _context.UserProfiles.FirstOrDefaultAsync();
-        if (user == null) return NotFound();
 
-        user.Name = userProfile.Name;
-        user.Avatar = userProfile.Avatar;
-        
-        await _context.SaveChangesAsync();
+    [HttpPut]
+    public async Task<IActionResult> UpdateUser(UserProfileDto userProfileDto)
+    {
+        var updated = await _service.UpdateUserProfileAsync(userProfileDto);
+        if (!updated) return NotFound();
         return NoContent();
     }
 }

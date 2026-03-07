@@ -1,7 +1,6 @@
-using dropbox_backend.Data;
-using dropbox_backend.Models;
+using dropbox_backend.Application.DTOs;
+using dropbox_backend.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace dropbox_backend.Controllers;
 
@@ -9,64 +8,49 @@ namespace dropbox_backend.Controllers;
 [Route("api/[controller]")]
 public class RecentFilesController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IRecentFileService _service;
 
-    public RecentFilesController(AppDbContext context)
+    public RecentFilesController(IRecentFileService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<RecentFile>>> GetRecentFiles()
+    public async Task<ActionResult<IEnumerable<RecentFileDto>>> GetRecentFiles()
     {
-        return await _context.RecentFiles.Include(f => f.SharedUsers).ToListAsync();
+        var files = await _service.GetAllRecentFilesAsync();
+        return Ok(files);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<RecentFile>> GetRecentFile(int id)
+    public async Task<ActionResult<RecentFileDto>> GetRecentFile(int id)
     {
-        var file = await _context.RecentFiles.Include(f => f.SharedUsers).FirstOrDefaultAsync(f => f.Id == id);
+        var file = await _service.GetRecentFileByIdAsync(id);
         if (file == null) return NotFound();
-        return file;
+        return Ok(file);
     }
 
     [HttpPost]
-    public async Task<ActionResult<RecentFile>> CreateRecentFile(RecentFile file)
+    public async Task<ActionResult<RecentFileDto>> CreateRecentFile(RecentFileDto fileDto)
     {
-        _context.RecentFiles.Add(file);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetRecentFile), new { id = file.Id }, file);
+        var created = await _service.CreateRecentFileAsync(fileDto);
+        return CreatedAtAction(nameof(GetRecentFile), new { id = created.Id }, created);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateRecentFile(int id, RecentFile file)
+    public async Task<IActionResult> UpdateRecentFile(int id, RecentFileDto fileDto)
     {
-        if (id != file.Id) return BadRequest();
-        
-        _context.Entry(file).State = EntityState.Modified;
-        
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!RecentFileExists(id)) return NotFound();
-            throw;
-        }
+        if (id != fileDto.Id) return BadRequest();
+        var updated = await _service.UpdateRecentFileAsync(id, fileDto);
+        if (!updated) return NotFound();
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteRecentFile(int id)
     {
-        var file = await _context.RecentFiles.FindAsync(id);
-        if (file == null) return NotFound();
-
-        _context.RecentFiles.Remove(file);
-        await _context.SaveChangesAsync();
+        var deleted = await _service.DeleteRecentFileAsync(id);
+        if (!deleted) return NotFound();
         return NoContent();
     }
-
-    private bool RecentFileExists(int id) => _context.RecentFiles.Any(e => e.Id == id);
 }

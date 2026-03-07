@@ -1,7 +1,6 @@
-using dropbox_backend.Data;
-using dropbox_backend.Models;
+using dropbox_backend.Application.DTOs;
+using dropbox_backend.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace dropbox_backend.Controllers;
 
@@ -9,64 +8,49 @@ namespace dropbox_backend.Controllers;
 [Route("api/[controller]")]
 public class FoldersController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IFolderService _service;
 
-    public FoldersController(AppDbContext context)
+    public FoldersController(IFolderService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Folder>>> GetFolders()
+    public async Task<ActionResult<IEnumerable<FolderDto>>> GetFolders()
     {
-        return await _context.Folders.Include(f => f.SharedUsers).ToListAsync();
+        var folders = await _service.GetAllFoldersAsync();
+        return Ok(folders);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Folder>> GetFolder(int id)
+    public async Task<ActionResult<FolderDto>> GetFolder(int id)
     {
-        var folder = await _context.Folders.Include(f => f.SharedUsers).FirstOrDefaultAsync(f => f.Id == id);
+        var folder = await _service.GetFolderByIdAsync(id);
         if (folder == null) return NotFound();
-        return folder;
+        return Ok(folder);
     }
 
     [HttpPost]
-    public async Task<ActionResult<Folder>> CreateFolder(Folder folder)
+    public async Task<ActionResult<FolderDto>> CreateFolder(FolderDto folderDto)
     {
-        _context.Folders.Add(folder);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetFolder), new { id = folder.Id }, folder);
+        var created = await _service.CreateFolderAsync(folderDto);
+        return CreatedAtAction(nameof(GetFolder), new { id = created.Id }, created);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateFolder(int id, Folder folder)
+    public async Task<IActionResult> UpdateFolder(int id, FolderDto folderDto)
     {
-        if (id != folder.Id) return BadRequest();
-        
-        _context.Entry(folder).State = EntityState.Modified;
-        
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!FolderExists(id)) return NotFound();
-            throw;
-        }
+        if (id != folderDto.Id) return BadRequest();
+        var updated = await _service.UpdateFolderAsync(id, folderDto);
+        if (!updated) return NotFound();
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteFolder(int id)
     {
-        var folder = await _context.Folders.FindAsync(id);
-        if (folder == null) return NotFound();
-
-        _context.Folders.Remove(folder);
-        await _context.SaveChangesAsync();
+        var deleted = await _service.DeleteFolderAsync(id);
+        if (!deleted) return NotFound();
         return NoContent();
     }
-
-    private bool FolderExists(int id) => _context.Folders.Any(e => e.Id == id);
 }

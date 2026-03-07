@@ -1,0 +1,70 @@
+{
+  "Storage": [
+    { "Id": 1, "Used": 600, "Total": 800, "Unit": "GB", "Percentage": 75 }
+  ],
+  "UserProfiles": [
+    { "Id": 1, "Name": "James Alto", "Avatar": "assets/avatars/avatar-1.png" }
+  ],
+  "NavigationItems": [
+    { "Id": "home", "Label": "Home", "Icon": "assets/icons/icon-home.svg", "Order": 1 },
+    { "Id": "my-files", "Label": "My Files", "Icon": "assets/icons/icon-my-files.svg", "Order": 2 },
+    { "Id": "starred", "Label": "Starred", "Icon": "assets/icons/icon-starred.svg", "Order": 3 },
+    { "Id": "shared", "Label": "Shared", "Icon": "assets/icons/icon-shared.svg", "Order": 4 },
+    { "Id": "file-requests", "Label": "Files Requests", "Icon": "assets/icons/icon-file-requests.svg", "Order": 5 },
+    { "Id": "deleted", "Label": "Deleted", "Icon": "assets/icons/icon-deleted.svg", "Order": 6 }
+  ],
+  "Folders": [
+    { "Id": 1, "Name": "Documents", "ModifiedDate": "Sep 25, 2022, 13:25 PM", "InsideFiles": 3985, "SharedUsersCount": 86 },
+    { "Id": 2, "Name": "Music", "ModifiedDate": "Sep 25, 2022, 13:25 PM", "InsideFiles": 499, "SharedUsersCount": 85 },
+    { "Id": 3, "Name": "ProjectK", "ModifiedDate": "Sep 25, 2022, 13:25 PM", "InsideFiles": 256, "SharedUsersCount": 0 },
+    { "Id": 4, "Name": "Rico Media", "ModifiedDate": "Sep 25, 2022, 13:25 PM", "InsideFiles": 1225, "SharedUsersCount": 52 },
+    { "Id": 5, "Name": "New Dev", "ModifiedDate": "Sep 25, 2022, 13:25 PM", "InsideFiles": 2265, "SharedUsersCount": 22 },
+    { "Id": 6, "Name": "Files 2022", "ModifiedDate": "Sep 25, 2022, 13:25 PM", "InsideFiles": 597, "SharedUsersCount": 12 }
+  ],
+  "RecentFiles": [
+    { "Id": 1, "Name": "Website Design.png", "Size": "2.8 MB", "ModifiedDate": "Dec 13, 2022", "Type": "image", "Icon": "assets/icons/icon-file-image.svg", "SharedUsersCount": 12 },
+    { "Id": 2, "Name": "UX-UI.zip", "Size": "242 MB", "ModifiedDate": "Dec 12, 2022", "Type": "archive", "Icon": "assets/icons/icon-folder.svg", "SharedUsersCount": 5 },
+    { "Id": 3, "Name": "Office.mp4", "Size": "1.8 GB", "ModifiedDate": "Dec 12, 2022", "Type": "video", "Icon": "assets/icons/icon-video.svg", "SharedUsersCount": 0 }
+  ],
+  "SharedUsers": [
+    { "Id": 1, "FolderId": 1, "Name": "User 1", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 2, "FolderId": 1, "Name": "User 2", "Avatar": "assets/avatars/avatar-2.png" },
+    { "Id": 3, "FolderId": 1, "Name": "User 3", "Avatar": "assets/avatars/avatar-3.png" },
+    { "Id": 4, "FolderId": 1, "Name": "User 4", "Avatar": "assets/avatars/avatar-4.png" },
+    { "Id": 5, "FolderId": 1, "Name": "User 5", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 6, "FolderId": 1, "Name": "User 6", "Avatar": "assets/avatars/avatar-2.png" },
+    { "Id": 7, "FolderId": 2, "Name": "User 1", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 8, "FolderId": 2, "Name": "User 2", "Avatar": "assets/avatars/avatar-2.png" },
+    { "Id": 9, "FolderId": 2, "Name": "User 3", "Avatar": "assets/avatars/avatar-3.png" },
+    { "Id": 10, "FolderId": 2, "Name": "User 4", "Avatar": "assets/avatars/avatar-4.png" },
+    { "Id": 11, "FolderId": 2, "Name": "User 5", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 12, "FolderId": 2, "Name": "User 6", "Avatar": "assets/avatars/avatar-2.png" },
+    { "Id": 13, "FolderId": 3, "Name": "User 1", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 14, "FolderId": 3, "Name": "User 2", "Avatar": "assets/avatars/avatar-2.png" },
+    { "Id": 15, "FolderId": 3, "Name": "User 3", "Avatar": "assets/avatars/avatar-3.png" },
+    { "Id": 16, "FolderId": 4, "Name": "User 1", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 17, "FolderId": 4, "Name": "User 2", "Avatar": "assets/avatars/avatar-2.png" },
+    { "Id": 18, "FolderId": 4, "Name": "User 3", "Avatar": "assets/avatars/avatar-3.png" },
+    { "Id": 19, "FolderId": 4, "Name": "User 4", "Avatar": "assets/avatars/avatar-4.png" },
+    { "Id": 20, "FolderId": 5, "Name": "User 1", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 21, "FolderId": 5, "Name": "User 2", "Avatar": "assets/avatars/avatar-2.png" },
+    { "Id": 22, "FolderId": 5, "Name": "User 3", "Avatar": "assets/avatars/avatar-3.png" },
+    { "Id": 23, "FolderId": 5, "Name": "User 4", "Avatar": "assets/avatars/avatar-4.png" },
+    { "Id": 24, "FolderId": 6, "Name": "User 1", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 25, "FolderId": 6, "Name": "User 2", "Avatar": "assets/avatars/avatar-2.png" },
+    { "Id": 26, "FolderId": 6, "Name": "User 3", "Avatar": "assets/avatars/avatar-3.png" },
+    { "Id": 27, "RecentFileId": 1, "Name": "User 1", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 28, "RecentFileId": 1, "Name": "User 2", "Avatar": "assets/avatars/avatar-2.png" },
+    { "Id": 29, "RecentFileId": 1, "Name": "User 3", "Avatar": "assets/avatars/avatar-3.png" },
+    { "Id": 30, "RecentFileId": 1, "Name": "User 4", "Avatar": "assets/avatars/avatar-4.png" },
+    { "Id": 31, "RecentFileId": 1, "Name": "User 5", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 32, "RecentFileId": 1, "Name": "User 6", "Avatar": "assets/avatars/avatar-2.png" },
+    { "Id": 33, "RecentFileId": 2, "Name": "User 1", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 34, "RecentFileId": 2, "Name": "User 2", "Avatar": "assets/avatars/avatar-2.png" },
+    { "Id": 35, "RecentFileId": 2, "Name": "User 3", "Avatar": "assets/avatars/avatar-3.png" },
+    { "Id": 36, "RecentFileId": 2, "Name": "User 4", "Avatar": "assets/avatars/avatar-4.png" },
+    { "Id": 37, "RecentFileId": 2, "Name": "User 5", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 38, "RecentFileId": 3, "Name": "User 1", "Avatar": "assets/avatars/avatar-1.png" },
+    { "Id": 39, "RecentFileId": 3, "Name": "User 2", "Avatar": "assets/avatars/avatar-2.png" }
+  ]
+}

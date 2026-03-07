@@ -1,4 +1,4 @@
-namespace dropbox_backend.Models;
+namespace dropbox_backend.Domain.Entities;
 
 public class UserProfile
 {

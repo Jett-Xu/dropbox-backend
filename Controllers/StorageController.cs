@@ -1,7 +1,6 @@
-using dropbox_backend.Data;
-using dropbox_backend.Models;
+using dropbox_backend.Application.DTOs;
+using dropbox_backend.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace dropbox_backend.Controllers;
 
@@ -9,33 +8,26 @@ namespace dropbox_backend.Controllers;
 [Route("api/[controller]")]
 public class StorageController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IStorageService _service;
 
-    public StorageController(AppDbContext context)
+    public StorageController(IStorageService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<ActionResult<StorageInfo>> GetStorage()
+    public async Task<ActionResult<StorageInfoDto>> GetStorage()
     {
-        var storage = await _context.Storage.FirstOrDefaultAsync();
+        var storage = await _service.GetStorageInfoAsync();
         if (storage == null) return NotFound();
-        return storage;
+        return Ok(storage);
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateStorage(StorageInfo storageInfo)
+    public async Task<IActionResult> UpdateStorage(StorageInfoDto storageInfoDto)
     {
-        var storage = await _context.Storage.FirstOrDefaultAsync();
-        if (storage == null) return NotFound();
-
-        storage.Used = storageInfo.Used;
-        storage.Total = storageInfo.Total;
-        storage.Unit = storageInfo.Unit;
-        storage.Percentage = storageInfo.Percentage;
-        
-        await _context.SaveChangesAsync();
+        var updated = await _service.UpdateStorageInfoAsync(storageInfoDto);
+        if (!updated) return NotFound();
         return NoContent();
     }
 }

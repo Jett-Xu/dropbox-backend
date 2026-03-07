@@ -1,7 +1,6 @@
-using dropbox_backend.Data;
-using dropbox_backend.Models;
+using dropbox_backend.Application.DTOs;
+using dropbox_backend.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace dropbox_backend.Controllers;
 
@@ -9,16 +8,17 @@ namespace dropbox_backend.Controllers;
 [Route("api/[controller]")]
 public class NavigationController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly INavigationService _service;
 
-    public NavigationController(AppDbContext context)
+    public NavigationController(INavigationService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<NavigationItem>>> GetNavigation()
+    public async Task<ActionResult<IEnumerable<NavigationItemDto>>> GetNavigation()
     {
-        return await _context.Navigations.OrderBy(n => n.Order).ToListAsync();
+        var nav = await _service.GetNavigationAsync();
+        return Ok(nav);
     }
 }

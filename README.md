@@ -6,31 +6,37 @@
 
 - **RESTful 介面**：使用 ASP.NET Core 實作標準的 Web API。
 - **PostgreSQL 整合**：透過 Npgsql.EntityFrameworkCore.PostgreSQL 連接實體資料庫。
-- **資料庫初始化與種子資料**：利用 EF Core 的 `HasData` 方法，自動部署和載入初始測試資料。
-- **依賴注入**：良好分層結構，以提升維護和擴充性。
+- **外部資料 JSON 種子化**：啟動時自動讀取外部的 `seed-data.json` 載入初始測試資料，避免 `AppDbContext` 變得冗長難以維護。
+- **DDD / Clean Architecture**：遵循領域驅動設計與 Clean Architecture，實作嚴謹的單向依賴分層結構，從根本上解決高耦合問題。
 
-## 專案資料夾架構與說明
+## 專案架構 (單向依賴: UI -> Application -> Domain -> Infrastructure)
 
-本專案採用經典的 MVC 架構，以下是每個主要資料夾的意義與職責範圍：
+本專案已經過重構，符合現代企業級的後端架構：
 
-- **`Controllers/` (控制器)**
-  - **意義**：這裡是應用程式的「進入點」。負責接收前端 (Client) 的 HTTP 請求 (GET, POST, PUT, DELETE)，叫用後端邏輯與資料庫，並將結果回傳給用戶端。
-  - **內容**：包含 `FoldersController`、`RecentFilesController`、`StorageController`、`NavigationController` 及 `UserProfileController`。
+- **`Controllers/` (展示層 / WebAPI)**
+  - **意義**：應用程式的「進入點」。只有一個極度單純的任務：接收 HTTP 請求 (GET, POST, PUT, DELETE)，將工作委託給 Application 層的 Services，然後回傳 DTO 給前端。絕對不會在此存取資料庫。
+  - **內容**：包含 `FoldersController`、`RecentFilesController` 等。
 
-- **`Models/` (資料實體模型)**
-  - **意義**：定義了應用程式中核心的資料結構與欄位。這些模型同時也會透過 Entity Framework Core 映射（對應）到 PostgreSQL 資料庫的真實在資料表 (Tables) 中。
-  - **內容**：包含 `Folder.cs`、`RecentFile.cs`、`StorageInfo.cs`、`SharedUser.cs`、`NavigationItem.cs` 及 `UserProfile.cs`。
+- **`Application/` (應用層)**
+  - **意義**：核心系統功能與使用案例。
+  - **內容**：
+    - `DTOs/` (Data Transfer Objects)：與外部交換資料的格式合約，避免將內部 Entities 直接暴露出去。
+    - `Interfaces/`：包含了業務權責的操作介面 (`IServices`)，以及定義基礎設施如何實作的介面合約 (`IRepositories`)。
+    - `Services/`：核心邏輯處理的實作，在這裡完成資料交換並呼叫 `IRepository` 從 DB 獲取資料。
 
-- **`Data/` (資料存放區/資料庫上下文)**
-  - **意義**：扮演應用程式與資料庫溝通的橋樑。負責管理實體模型和資料庫之間的存取與變更追蹤。這裡同時設定了資料庫建立時的「種子資料 (Seed Data)」。
-  - **內容**：包含 `AppDbContext.cs`。
+- **`Domain/` (領域層)**
+  - **意義**：系統的核心，包含商業邏輯與最小資料單位，保持純淨，不會依賴任何框架或資料庫的細節。
+  - **內容**：包含 `Entities/` (如 `Folder`, `SharedUser`, `RecentFile` 等)。
 
-- **`Properties/` (專案設定)**
-  - **意義**：包含 .NET 專案的啟動設定檔。
-  - **內容**：`launchSettings.json`，其中設定了專案在不同環境 (例如 Development) 啟動時所綁定的 Port 以及啟動的環境變數。
+- **`Infrastructure/` (基礎設施層)**
+  - **意義**：負責所有外部依賴工作，例如資料庫實作。
+  - **內容**：
+    - `Data/AppDbContext.cs`：EF Core 與資料庫溝通的媒介。
+    - `Repositories/`：實踐 `Application/Interfaces` 裡頭設定的 `IRepository` 介面，封裝資料庫的 C.R.U.D.。
+    - `Seed/DbSeeder.cs` 與 `seed-data.json`：專案啟動時自動運行的資料庫起始資料設定機制。
 
-- **`Migrations/` (資料庫遷移記錄)** _(執行 `dotnet ef migrations add` 後產生)_
-  - **意義**：Entity Framework Core 的資料庫版本控制。當你的 Models 結構變更時（例如新增欄位），EF Core 會在這裡生成 C# 檔案來紀錄這些變更，以利後續更新到實體的 PostgreSQL 資料庫結構。
+- **`Migrations/` (資料庫遷移記錄)**
+  - Entity Framework Core 的資料庫版本控制。
 
 ## 環境設定與執行
 
@@ -42,21 +48,22 @@
 
 ### 2. 資料庫環境建立 (Docker)
 
-本專案配置了 `docker-compose.yml` 來快速啟動 PostgreSQL 16 測試資料庫環境。連線資訊已於 `appsettings.Development.json` 中配置妥當。
-
+本專案配置了 `docker-compose.yml` 來快速啟動 PostgreSQL 16。
 請確定電腦已安裝並開啟 Docker，於專案根目錄終端機執行：
 
 ```bash
 docker compose up -d
 ```
 
-### 3. 執行資料庫遷移與資料庫建立
+### 3. 資料庫更新與套用
 
-當 Docker 容器啟動後，請執行以下 Entity Framework 指令來建立資料表和初始化預設的測試資料（種子資料）：
+當 Docker 容器啟動後，請執行以下 Entity Framework 指令來建立資料表：
 
 ```bash
 dotnet ef database update
 ```
+
+_(注意：預設假資料已經不再寫死於 Migration 當中，而是改由應用程式啟動時從 `seed-data.json` 自動進行 Seed。)_
 
 ### 4. 啟動專案
 
@@ -66,7 +73,7 @@ dotnet ef database update
 dotnet run
 ```
 
-專案啟動後，可以透過瀏覽器訪問 Scalar API 文件介面查看和測試所有 API 端點 (通常路徑為 `http://localhost:<port>/scalar/v1`)。
+專案啟動後（第一次啟動時，若資料庫為空，系統會自動載入 `seed-data.json` 裡的預設資料），可以透過瀏覽器訪問 Scalar API 文件介面查看和測試所有 API 端點 (通常路徑為 `http://localhost:<port>/scalar/v1`)。
 
 ## 可用 API 列表
 

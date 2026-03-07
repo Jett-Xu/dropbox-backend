@@ -1,4 +1,8 @@
-using dropbox_backend.Data;
+using dropbox_backend.Application.Interfaces;
+using dropbox_backend.Application.Services;
+using dropbox_backend.Infrastructure.Data;
+using dropbox_backend.Infrastructure.Repositories;
+using dropbox_backend.Infrastructure.Seed;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -20,8 +24,20 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Dependency Injection for DDD Layers
+builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+builder.Services.AddScoped<INavigationRepository, NavigationRepository>();
+builder.Services.AddScoped<IRecentFileRepository, RecentFileRepository>();
+builder.Services.AddScoped<IStorageRepository, StorageRepository>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+
+builder.Services.AddScoped<IFolderService, FolderService>();
+builder.Services.AddScoped<INavigationService, NavigationService>();
+builder.Services.AddScoped<IRecentFileService, RecentFileService>();
+builder.Services.AddScoped<IStorageService, StorageService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -36,9 +52,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
+
+// Run Database Seeder
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+    await DbSeeder.SeedAsync(context, env.ContentRootPath);
+}
 
 app.Run();

@@ -3,12 +3,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace dropbox_backend.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreateDDD : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,6 +25,20 @@ namespace dropbox_backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Folders", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Navigations",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    Label = table.Column<string>(type: "text", nullable: false),
+                    Icon = table.Column<string>(type: "text", nullable: false),
+                    Order = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Navigations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -63,46 +75,77 @@ namespace dropbox_backend.Migrations
                     table.PrimaryKey("PK_Storage", x => x.Id);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Folders",
-                columns: new[] { "Id", "InsideFiles", "ModifiedDate", "Name", "SharedUsersCount" },
-                values: new object[,]
+            migrationBuilder.CreateTable(
+                name: "UserProfiles",
+                columns: table => new
                 {
-                    { 1, 3985, "Sep 25, 2022, 13:25 PM", "Documents", 86 },
-                    { 2, 499, "Sep 25, 2022, 13:25 PM", "Music", 85 },
-                    { 3, 256, "Sep 25, 2022, 13:25 PM", "ProjectK", 0 },
-                    { 4, 1225, "Sep 25, 2022, 13:25 PM", "Rico Media", 52 },
-                    { 5, 2265, "Sep 25, 2022, 13:25 PM", "New Dev", 22 },
-                    { 6, 597, "Sep 25, 2022, 13:25 PM", "Files 2022", 12 }
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Avatar = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserProfiles", x => x.Id);
                 });
 
-            migrationBuilder.InsertData(
-                table: "RecentFiles",
-                columns: new[] { "Id", "Icon", "ModifiedDate", "Name", "SharedUsersCount", "Size", "Type" },
-                values: new object[,]
+            migrationBuilder.CreateTable(
+                name: "SharedUsers",
+                columns: table => new
                 {
-                    { 1, "assets/icons/icon-file-image.svg", "Dec 13, 2022", "Website Design.png", 12, "2.8 MB", "image" },
-                    { 2, "assets/icons/icon-folder.svg", "Dec 12, 2022", "UX-UI.zip", 5, "242 MB", "archive" },
-                    { 3, "assets/icons/icon-video.svg", "Dec 12, 2022", "Office.mp4", 0, "1.8 GB", "video" }
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Avatar = table.Column<string>(type: "text", nullable: false),
+                    FolderId = table.Column<int>(type: "integer", nullable: true),
+                    RecentFileId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SharedUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SharedUsers_Folders_FolderId",
+                        column: x => x.FolderId,
+                        principalTable: "Folders",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SharedUsers_RecentFiles_RecentFileId",
+                        column: x => x.RecentFileId,
+                        principalTable: "RecentFiles",
+                        principalColumn: "Id");
                 });
 
-            migrationBuilder.InsertData(
-                table: "Storage",
-                columns: new[] { "Id", "Percentage", "Total", "Unit", "Used" },
-                values: new object[] { 1, 75, 800, "GB", 600 });
+            migrationBuilder.CreateIndex(
+                name: "IX_SharedUsers_FolderId",
+                table: "SharedUsers",
+                column: "FolderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SharedUsers_RecentFileId",
+                table: "SharedUsers",
+                column: "RecentFileId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Navigations");
+
+            migrationBuilder.DropTable(
+                name: "SharedUsers");
+
+            migrationBuilder.DropTable(
+                name: "Storage");
+
+            migrationBuilder.DropTable(
+                name: "UserProfiles");
+
+            migrationBuilder.DropTable(
                 name: "Folders");
 
             migrationBuilder.DropTable(
                 name: "RecentFiles");
-
-            migrationBuilder.DropTable(
-                name: "Storage");
         }
     }
 }
