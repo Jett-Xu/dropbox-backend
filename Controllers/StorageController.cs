@@ -22,12 +22,4 @@ public class StorageController : ControllerBase
         if (storage == null) return NotFound();
         return Ok(storage);
     }
-
-    [HttpPut]
-    public async Task<IActionResult> UpdateStorage(StorageInfoDto storageInfoDto)
-    {
-        var updated = await _service.UpdateStorageInfoAsync(storageInfoDto);
-        if (!updated) return NotFound();
-        return NoContent();
-    }
 }

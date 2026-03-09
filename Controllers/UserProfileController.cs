@@ -22,12 +22,4 @@ public class UserProfileController : ControllerBase
         if (user == null) return NotFound();
         return Ok(user);
     }
-
-    [HttpPut]
-    public async Task<IActionResult> UpdateUser(UserProfileDto userProfileDto)
-    {
-        var updated = await _service.UpdateUserProfileAsync(userProfileDto);
-        if (!updated) return NotFound();
-        return NoContent();
-    }
 }

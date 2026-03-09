@@ -11,8 +11,6 @@
 
 ## 專案架構 (單向依賴: UI -> Application -> Domain -> Infrastructure)
 
-本專案已經過重構，符合現代企業級的後端架構：
-
 - **`Controllers/` (展示層 / WebAPI)**
   - **意義**：應用程式的「進入點」。只有一個極度單純的任務：接收 HTTP 請求 (GET, POST, PUT, DELETE)，將工作委託給 Application 層的 Services，然後回傳 DTO 給前端。絕對不會在此存取資料庫。
   - **內容**：包含 `FoldersController`、`RecentFilesController` 等。
@@ -20,19 +18,19 @@
 - **`Application/` (應用層)**
   - **意義**：核心系統功能與使用案例。
   - **內容**：
-    - `DTOs/` (Data Transfer Objects)：與外部交換資料的格式合約，避免將內部 Entities 直接暴露出去。
-    - `Interfaces/`：包含了業務權責的操作介面 (`IServices`)，以及定義基礎設施如何實作的介面合約 (`IRepositories`)。
-    - `Services/`：核心邏輯處理的實作，在這裡完成資料交換並呼叫 `IRepository` 從 DB 獲取資料。
+    - `DTOs/` (Data Transfer Objects)：與外部交換資料的格式合約，每一種實體皆有獨立檔案 (如 `FolderDto.cs`) 歸納管理。
+    - `Interfaces/`：包含了業務權責操作的介面合約 (如 `IFolderService` 等)，與定義基礎設施實作的合約 (如 `IFolderRepository` 等)。
+    - `Services/`：核心邏輯的實作，依循單一職責原則獨立成多個檔案 (如 `FolderService.cs` 等)，在這裡完成資料交換並呼叫 `IRepository` 從 DB 獲取資料。
 
 - **`Domain/` (領域層)**
   - **意義**：系統的核心，包含商業邏輯與最小資料單位，保持純淨，不會依賴任何框架或資料庫的細節。
-  - **內容**：包含 `Entities/` (如 `Folder`, `SharedUser`, `RecentFile` 等)。
+  - **內容**：包含 `Entities/` (如獨立成檔的 `Folder.cs`, `SharedUser.cs`, `RecentFile.cs` 等)。
 
 - **`Infrastructure/` (基礎設施層)**
   - **意義**：負責所有外部依賴工作，例如資料庫實作。
   - **內容**：
     - `Data/AppDbContext.cs`：EF Core 與資料庫溝通的媒介。
-    - `Repositories/`：實踐 `Application/Interfaces` 裡頭設定的 `IRepository` 介面，封裝資料庫的 C.R.U.D.。
+    - `Repositories/`：實踐 `Application/Interfaces` 裡頭設定的 `IRepository` 介面，依主體獨立封裝具體的資料庫操作 (如 `FolderRepository.cs` 等)。
     - `Seed/DbSeeder.cs` 與 `seed-data.json`：專案啟動時自動運行的資料庫起始資料設定機制。
 
 - **`Migrations/` (資料庫遷移記錄)**
@@ -79,21 +77,13 @@ dotnet run
 
 - **Folders (資料夾)**
   - `GET /api/Folders` - 取得所有資料夾
-  - `GET /api/Folders/{id}` - 取得特定資料夾
-  - `POST /api/Folders` - 新增資料夾
-  - `PUT /api/Folders/{id}` - 更新資料夾
   - `DELETE /api/Folders/{id}` - 刪除資料夾
 - **RecentFiles (最近檔案)**
   - `GET /api/RecentFiles` - 取得所有最近檔案
-  - `GET /api/RecentFiles/{id}` - 取得特定檔案
-  - `POST /api/RecentFiles` - 新增檔案
-  - `PUT /api/RecentFiles/{id}` - 更新檔案
   - `DELETE /api/RecentFiles/{id}` - 刪除檔案
 - **Storage (儲存空間)**
   - `GET /api/Storage` - 取得儲存空間資訊
-  - `PUT /api/Storage` - 更新儲存空間資訊
 - **Navigation (側邊選單)**
   - `GET /api/Navigation` - 取得所有左側選單項目
 - **UserProfile (使用者資訊)**
   - `GET /api/UserProfile` - 取得目前使用者資訊
-  - `PUT /api/UserProfile` - 更新使用者資訊
