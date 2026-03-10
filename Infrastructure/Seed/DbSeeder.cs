@@ -9,11 +9,9 @@ public class DbSeeder
 {
     public static async Task SeedAsync(AppDbContext context, string webRootPath)
     {
+        // 每次應用程式啟動時，先強制刪除並重建資料庫，確保每次測試拿到的都是 `seed-data.json` 裡最乾淨的初始狀態
+        await context.Database.EnsureDeletedAsync();
         await context.Database.MigrateAsync();
-
-        if (await context.Storage.AnyAsync())
-            return; // Already seeded
-
         var seedFilePath = Path.Combine(webRootPath, "Infrastructure", "Seed", "seed-data.json");
         if (!File.Exists(seedFilePath))
             return;
